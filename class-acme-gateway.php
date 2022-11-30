@@ -1,7 +1,5 @@
 <?php
 
-namespace GiveACME\ACMETestGateway;
-
 use Give\Donations\Models\Donation;
 use Give\Donations\Models\DonationNote;
 use Give\Donations\ValueObjects\DonationStatus;
@@ -10,15 +8,9 @@ use Give\Framework\Http\Response\Types\RedirectResponse;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
 use Give\Framework\PaymentGateways\PaymentGateway;
-use Give\Helpers\Form\Utils as FormUtils;
 use Give\PaymentGateways\Gateways\PayPalStandard\Actions\GenerateDonationReceiptPageUrl;
-use Give\PaymentGateways\Gateways\TestGateway\Views\LegacyFormFieldMarkup;
-
-
 use Give\Subscriptions\Models\Subscription;
-
 use Give\Subscriptions\ValueObjects\SubscriptionStatus;
-
 use function Give\Framework\Http\Response\response;
 
 
@@ -73,14 +65,7 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
-        if (FormUtils::isLegacyForm($formId)) {
-            return false;
-        }
-
-        /** @var LegacyFormFieldMarkup $legacyFormFieldMarkup */
-        $legacyFormFieldMarkup = give(LegacyFormFieldMarkup::class);
-
-        return $legacyFormFieldMarkup();
+        return "Hello World";
     }
 
     /**
@@ -88,6 +73,8 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function createPayment(Donation $donation, $gatewayData = null)
     {
+        //Do SDK Stuff
+        
         $redirectUrl = $this->generateSecureGatewayRouteUrl(
             'securelyReturnFromOffsiteRedirect',
             $donation->id,

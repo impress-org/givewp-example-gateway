@@ -11,11 +11,8 @@
  * Domain Path: /languages
  */
 
-add_action ('init', function() {
-    include 'class-acme-gateway.php';    
-});
 
-add_action('before_give_init', function () {
-   
-    give()->registerServiceProvider(AcmeGateway\PaymentGateway\ServiceProvider::class);
+add_action('givewp_register_payment_gateway', function ($paymentGatewayRegister) {
+    include 'class-acme-gateway.php';  
+    $paymentGatewayRegister->registerGateway(AcmeGatewayClass::class);
 });
