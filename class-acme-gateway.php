@@ -13,7 +13,8 @@ use Give\Framework\PaymentGateways\PaymentGateway;
 use Give\Helpers\Form\Utils as FormUtils;
 use Give\PaymentGateways\Gateways\PayPalStandard\Actions\GenerateDonationReceiptPageUrl;
 use Give\PaymentGateways\Gateways\TestGateway\Views\LegacyFormFieldMarkup;
-use Give\Framework\PaymentGateways\PaymentGatewayRegister;
+
+
 use Give\Subscriptions\Models\Subscription;
 
 use Give\Subscriptions\ValueObjects\SubscriptionStatus;

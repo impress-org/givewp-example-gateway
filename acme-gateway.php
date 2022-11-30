@@ -17,5 +17,5 @@ add_action ('init', function() {
 
 add_action('before_give_init', function () {
    
-        give()->registerServiceProvider(AcmeGateway\PaymentGateway\ServiceProvider::class);
+    give()->registerServiceProvider(AcmeGateway\PaymentGateway\ServiceProvider::class);
 });
