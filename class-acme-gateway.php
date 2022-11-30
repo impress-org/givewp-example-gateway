@@ -65,6 +65,7 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
+        // For an offsite gateway, this is just help text. 
         return "Hello World";
     }
 
@@ -89,6 +90,9 @@ class AcmeGatewayClass extends PaymentGateway
         Subscription $subscription,
         $gatewayData = null
     ): GatewayCommand {
+
+        // Do SDK Stuff
+        
         $redirectUrl = $this->generateSecureGatewayRouteUrl(
             'securelyReturnFromOffsiteRedirect',
             $donation->id,
