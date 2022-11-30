@@ -1,6 +1,6 @@
 === Give - ACME Test Gateway ===
 Contributors: givewp
-Tags: donations, donation, ecommerce, e-commerce, fundraising, fundraiser, paymill, gateway
+Tags: donations, donation, ecommerce, e-commerce, fundraising, fundraiser, gateway
 Requires at least: 5.0
 Tested up to: 6.1
 Stable tag: 0.1.1
