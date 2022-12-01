@@ -17,9 +17,9 @@ use function Give\Framework\Http\Response\response;
 
 /**
  * Class ACME-TestGatewayOffsite
- * @since 2.18.0
+ * 
  */
-class AcmeGatewayClass extends PaymentGateway
+class AcmeGatewayOffsiteClass extends PaymentGateway
 {
     /**
      * @inheritDoc
@@ -49,7 +49,7 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('ACME Test Gateway Offsite', 'give-acme');
+        return __('ACME Test Gateway Offsite', 'acme-give');
     }
 
     /**
@@ -57,7 +57,7 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('ACME Test Gateway Offsite', 'give-acme');
+        return __('ACME Test Gateway Offsite', 'acme-give');
     }
 
     /**
@@ -65,23 +65,52 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
-        // For an offsite gateway, this is just help text. 
-        return "Hello World";
+        // For an offsite gateway, this is just help text that displays on the form. 
+        return "<div class='acme-offsite-help-text'>
+                    You will be taken away to ACME to complete the donation!
+                </div>";
     }
 
     /**
      * @inheritDoc
      */
+    public function getAcmeParameters(Donation $donation): array
+    {
+        // Sample Data to send to a gateway. Not the most secure thing to include the ID and KEYS as shown here.
+        return [
+            'merchant_id' => '000000000000000000000',
+            'merchant_key' => '111111111111111111111',
+            'return_url' => give_get_success_page_uri(),
+            'cancel_url' => give_get_failed_transaction_uri(),
+            'notify_url' => get_site_url() . '/?give-listener=ACME',
+            'name_first' => $donation->firstName,
+            'name_last' => $donation->lastName,
+            'email_address' => $donation->email,
+            'm_payment_id' => $donation->id,
+            'amount' => $donation->amount->formatToDecimal(),
+            'item_name' => $donation->formTitle,
+            'item_description' => sprintf(__('Donation via GiveWP, ID %s', 'acme-give'), $donation->id),
+        ];
+    }
+    /**
+     * @inheritDoc
+     */
     public function createPayment(Donation $donation, $gatewayData = null)
     {
-        //Do SDK Stuff
         
-        $redirectUrl = $this->generateSecureGatewayRouteUrl(
-            'securelyReturnFromOffsiteRedirect',
-            $donation->id,
-            ['give-donation-id' => $donation->id]
-        );
+        $params = $this->getAcmeParameters($donation);
+        
+        // To see it actually redirect, uncomment this next line, and put in a valid API URL:
+        $redirectUrl = add_query_arg($params, "https://example.com");
 
+        // Optional: use the built-in method for generating a secure return URL
+
+        // $redirectUrl .= $this->generateSecureGatewayRouteUrl(
+        //    'securelyReturnFromOffsiteRedirect',
+        //    $donation->id,
+        //    ['give-donation-id' => $donation->id]
+        //);
+        
         return new RedirectOffsite($redirectUrl);
     }
 
@@ -91,26 +120,39 @@ class AcmeGatewayClass extends PaymentGateway
         $gatewayData = null
     ): GatewayCommand {
 
-        // Do SDK Stuff
-        
-        $redirectUrl = $this->generateSecureGatewayRouteUrl(
-            'securelyReturnFromOffsiteRedirect',
-            $donation->id,
-            [
-                'give-donation-id' => $donation->id,
-                'give-subscription-id' => $subscription->id,
-            ]
-        );
+        // Create a variable with an array of additional data needed to create the subscription. 
+        // Sample data is included here.
+        $subscriptionParams = [
+            'subscription_type' => '1', 
+            'frequency' => '',
+            'cycles' => '',
+            'recurring_amount' => '',
+        ];
 
+        // Optional: use the built-in method for generating a secure return URL
+
+        //$redirectUrl = $this->generateSecureGatewayRouteUrl(
+        //    'securelyReturnFromOffsiteRedirect',
+        //    $donation->id,
+        //    [
+        //        'give-donation-id' => $donation->id,
+        //        'give-subscription-id' => $subscription->id,
+        //    ]
+        //);
+
+        $params = array_merge(
+            $this->getAcmeParameters($donation),
+            $subscriptionParams);
+
+        $redirectUrl = add_query_arg($params, "https://example.com");
+        
         return new RedirectOffsite($redirectUrl);
     }
 
     /**
      * An example of using a secureRouteMethod for extending the Gateway API to handle a redirect.
      *
-     * @since 2.21.0 update to use Donation model
-     * @since 2.19.0
-     *
+     * 
      * @param array $queryParams
      *
      * @return RedirectResponse
