@@ -49,7 +49,7 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('Onsite ACME Test Gateway', 'os-acme-give');
+        return __('Onsite ACME Test Gateway', 'acme-give');
     }
 
     /**
@@ -57,7 +57,7 @@ class AcmeGatewayClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('Onsite ACME Test Gateway', 'os-acme-give');
+        return __('Onsite ACME Test Gateway', 'acme-give');
     }
 
     /**
@@ -88,7 +88,7 @@ class AcmeGatewayClass extends PaymentGateway
 
             DonationNote::create([
                 'donationId' => $donation->id,
-                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'os-acme-give'), $errorMessage)
+                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'acme-give'), $errorMessage)
             ]);
 
             throw new PaymentGatewayException($errorMessage);
@@ -115,7 +115,7 @@ class AcmeGatewayClass extends PaymentGateway
 
             DonationNote::create([
                 'donationId' => $donation->id,
-                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'os-acme-give'), $errorMessage)
+                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'acme-give'), $errorMessage)
             ]);
 
             throw new PaymentGatewayException($errorMessage);
