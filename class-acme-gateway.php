@@ -80,7 +80,6 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         return [
             'merchant_id' => '000000000000000000000',
             'merchant_key' => '111111111111111111111',
-            'return_url' => give_get_success_page_uri(),
             'cancel_url' => give_get_failed_transaction_uri(),
             'notify_url' => get_site_url() . '/?give-listener=ACME',
             'name_first' => $donation->firstName,
@@ -98,20 +97,14 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
     public function createPayment(Donation $donation, $gatewayData = null)
     {
         
-        $params = $this->getAcmeParameters($donation);
-        
+        $baseParams = $this->getAcmeParameters($donation);
+        $returnUrl = ['return_url' => $this->generateSecureGatewayRouteUrl('securelyReturnFromOffsiteRedirect', $donation->id, ['give-donation-id' => $donation->id])];
+        $params = array_merge($baseParams, $returnUrl);
+
         // To see it actually redirect, uncomment this next line, and put in a valid API URL:
-        $redirectUrl = add_query_arg($params, "https://example.com");
-
-        // Optional: use the built-in method for generating a secure return URL
-
-        // $redirectUrl .= $this->generateSecureGatewayRouteUrl(
-        //    'securelyReturnFromOffsiteRedirect',
-        //    $donation->id,
-        //    ['give-donation-id' => $donation->id]
-        //);
+        $url = add_query_arg($params, "https://example.com");
         
-        return new RedirectOffsite($redirectUrl);
+        return new RedirectOffsite($url);
     }
 
     public function createSubscription(
@@ -126,27 +119,19 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
             'subscription_type' => '1', 
             'frequency' => '',
             'cycles' => '',
-            'recurring_amount' => '',
+            'recurring_amount' => $donation->amount->formatToDecimal(),
         ];
 
-        // Optional: use the built-in method for generating a secure return URL
 
-        //$redirectUrl = $this->generateSecureGatewayRouteUrl(
-        //    'securelyReturnFromOffsiteRedirect',
-        //    $donation->id,
-        //    [
-        //        'give-donation-id' => $donation->id,
-        //        'give-subscription-id' => $subscription->id,
-        //    ]
-        //);
-
-        $params = array_merge(
+        $baseParams = array_merge(
             $this->getAcmeParameters($donation),
             $subscriptionParams);
+        $returnUrl = ['return_url' => $this->generateSecureGatewayRouteUrl('securelyReturnFromOffsiteRedirect', $donation->id, ['give-donation-id' => $donation->id, 'give-subscription-id' => $subscription->id,])];
+        $params = array_merge($baseParams, $returnUrl);
 
-        $redirectUrl = add_query_arg($params, "https://example.com");
+        $url = add_query_arg($params, "https://example.com");
         
-        return new RedirectOffsite($redirectUrl);
+        return new RedirectOffsite($url);
     }
 
     /**
@@ -156,7 +141,6 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      * @param array $queryParams
      *
      * @return RedirectResponse
-     * @throws Exception
      */
     protected function securelyReturnFromOffsiteRedirect(array $queryParams): RedirectResponse
     {
