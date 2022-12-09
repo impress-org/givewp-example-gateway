@@ -8,6 +8,7 @@ use Give\Framework\Http\Response\Types\RedirectResponse;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
 use Give\Framework\PaymentGateways\PaymentGateway;
+use Give\Framework\PaymentGateways\Log\PaymentGatewayLog;
 use Give\PaymentGateways\Gateways\PayPalStandard\Actions\GenerateDonationReceiptPageUrl;
 use Give\Subscriptions\Models\Subscription;
 use Give\Subscriptions\ValueObjects\SubscriptionStatus;
@@ -49,7 +50,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('ACME Test Gateway Offsite', 'acme-give');
+        return __('Offsite ACME Test Gateway ', 'acme-give');
     }
 
     /**
@@ -57,7 +58,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('ACME Test Gateway Offsite', 'acme-give');
+        return __('Offsite ACME Test Gateway', 'acme-give');
     }
 
     /**
@@ -157,7 +158,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
     }
 
     /**
-     * @since 2.20.0
+     * 
      * @inerhitDoc
      * @throws Exception
      */
@@ -186,7 +187,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
     }
 
     /**
-     * @since 2.23.0
+     * 
      *
      * @return void
      */
@@ -195,5 +196,35 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         $subscription->status = SubscriptionStatus::ACTIVE();
         $subscription->transactionId = "acme-test-gateway-transaction-id";
         $subscription->save();
+    }
+
+    public function updateSubscriptionAmount(Subscription $subscription, $newRenewalAmount )
+    {
+        // some functions to send the call to the gateway to update the amount. $newRenewalAmount is the updated amount of the subscriptions.
+        $apiResponse = true;
+        
+        if( $apiResponse == false )
+        {
+            PaymentGatewayLog::error(
+            sprintf(__('Failed to update amount for subscription %s.',
+                'acme-give'),
+                $subscription->id),
+            [
+                'Payment Gateway' => $this->getName(),
+                'Subscription' => $subscription->$id,
+                'Error Code' => "999",
+                'Error Message' => "something actionable from the gateway!",
+            ]
+        );
+        throw new PaymentGatewayException(__('The amount was not updated.',
+                'acme-give'));
+        }
+
+        PaymentGatewayLog::info( 'Amount updated ', [ 'Payment Gateway' => "noodles",
+        'Subscription' => "mo problems",]);
+    }
+    public function updateSubscriptionPaymentMethod(Subscription $subscription, $gatewayData=null)
+    {
+
     }
 }

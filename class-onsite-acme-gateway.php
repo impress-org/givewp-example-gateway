@@ -16,10 +16,10 @@ use function Give\Framework\Http\Response\response;
 
 
 /**
- * Class AcmeGatewayClass
+ * Class AcmeGatewayOnsiteClass
  * 
  */
-class AcmeGatewayClass extends PaymentGateway
+class AcmeGatewayOnsiteClass extends PaymentGateway
 {
     /**
      * @inheritDoc
@@ -66,8 +66,8 @@ class AcmeGatewayClass extends PaymentGateway
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
         // Markup added here
-        return "<div id='acme-card-field></div>
-                <div id='acme-expiration-field></div>";
+        return "<div id='acme-card-field>A Field</div>
+                <div id='acme-expiration-field>B Field</div>";
     }
 
     /**
@@ -148,5 +148,13 @@ class AcmeGatewayClass extends PaymentGateway
         $subscription->status = SubscriptionStatus::ACTIVE();
         $subscription->transactionId = "acme-test-gateway-transaction-id";
         $subscription->save();
+    }
+
+    public function updateSubscriptionPaymentMethod(Subscription $subscription, $gatewayData=null)
+    {
+
+    }
+    public function updateSubscriptionAmount(Subscription $subscription, $newRenewalAmount )
+    {
     }
 }

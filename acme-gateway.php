@@ -16,6 +16,6 @@ add_action('givewp_register_payment_gateway', function ($paymentGatewayRegister)
     include 'class-offsite-acme-gateway.php';  
     include 'class-onsite-acme-gateway.php';  
     $paymentGatewayRegister->registerGateway(AcmeGatewayOffsiteClass::class);
-    $paymentGatewayRegister->registerGateway(AcmeGatewayClass::class);
+    $paymentGatewayRegister->registerGateway(AcmeGatewayOnsiteClass::class);
 });
 
