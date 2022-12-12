@@ -6,6 +6,7 @@ use Give\Donations\ValueObjects\DonationStatus;
 use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\Http\Response\Types\RedirectResponse;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
+use Give\Framework\PaymentGateways\Commands\PaymentComplete;
 use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
 use Give\Framework\PaymentGateways\PaymentGateway;
 use Give\Framework\PaymentGateways\Log\PaymentGatewayLog;
@@ -154,7 +155,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
             $this->updateSubscription($subscription);
         }
 
-        return response()->redirectTo((new GenerateDonationReceiptPageUrl())($donation->id));
+        return new PaymentComplete("offsite-acme-gateway-transaction-id-$donation->id");
     }
 
     /**
