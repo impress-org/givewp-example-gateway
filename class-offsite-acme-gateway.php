@@ -144,7 +144,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      *
      * @return RedirectResponse
      */
-    protected function securelyReturnFromOffsiteRedirect(array $queryParams): RedirectResponse
+    protected function securelyReturnFromOffsiteRedirect(array $queryParams)
     {
         $donation = Donation::find($queryParams['give-donation-id']);
 
