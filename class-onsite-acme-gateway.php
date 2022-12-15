@@ -66,8 +66,8 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
         // Markup added here
-        return "<div id='acme-card-field>A Field</div>
-                <div id='acme-expiration-field>B Field</div>";
+        return "<div id='acme-card-field'>A Field</div>
+                <div id='acme-expiration-field'>B Field</div>";
     }
 
     /**
