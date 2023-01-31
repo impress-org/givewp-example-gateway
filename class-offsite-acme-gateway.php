@@ -103,7 +103,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         $returnUrl = ['return_url' => $this->generateSecureGatewayRouteUrl('securelyReturnFromOffsiteRedirect', $donation->id, ['give-donation-id' => $donation->id])];
         $params = array_merge($baseParams, $returnUrl);
 
-        // To see it actually redirect, uncomment this next line, and put in a valid API URL:
+        // This will redirect to example.com and one of the query strings will be the URL that you can visit to simulate a successful donation.
         $url = add_query_arg($params, "https://example.com");
         
         return new RedirectOffsite($url);

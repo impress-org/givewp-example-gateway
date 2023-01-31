@@ -11,7 +11,7 @@
  * Domain Path: /languages
  */
 
-// Register the Offsite gateway (where donors are redirected to complete the donation)
+// Register the gateways 
 add_action('givewp_register_payment_gateway', function ($paymentGatewayRegister) {
     include 'class-offsite-acme-gateway.php';  
     include 'class-onsite-acme-gateway.php';  
