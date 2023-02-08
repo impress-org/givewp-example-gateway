@@ -1,23 +1,31 @@
 <?php
 
-use Give\Framework\PaymentGateways\PaymentGateway; //Required. used to create the new class of the custom gateway
-use Give\Donations\Models\Donation; // Required.  
-use Give\Donations\ValueObjects\DonationStatus; // Required. 
-use Give\Framework\PaymentGateways\Commands\PaymentComplete; // Required.
-use Give\Framework\PaymentGateways\Commands\GatewayCommand; // Required.
-use Give\Framework\PaymentGateways\Commands\SubscriptionComplete; // Required for Recurring Donations.
-use Give\Subscriptions\Models\Subscription; // Required for Recurring Donations.
-use Give\Subscriptions\ValueObjects\SubscriptionStatus; // Required for Recurring Donations.
-use Give\Donations\Models\DonationNote; // Optional but highly recommended to add notes especially in the event of errors or updates to donations
-use Give\Framework\Exceptions\Primitives\Exception; // Optional. Required if you want to catch and record payment gateway errors.  
+use Give\Donations\Models\Donation;
+use Give\Donations\Models\DonationNote;
+use Give\Donations\ValueObjects\DonationStatus;
+use Give\Framework\Exceptions\Primitives\Exception;
+use Give\Framework\PaymentGateways\Commands\GatewayCommand;
+use Give\Framework\PaymentGateways\Commands\PaymentComplete;
+use Give\Framework\PaymentGateways\Commands\SubscriptionComplete;
+use Give\Framework\PaymentGateways\PaymentGateway;
+use Give\Subscriptions\Models\Subscription;
+use Give\Subscriptions\ValueObjects\SubscriptionStatus;
 
-use function Give\Framework\Http\Response\response;
-
+//Required. used to create the new class of the custom gateway
+// Required.
+// Required.
+// Required.
+// Required.
+// Required for Recurring Donations.
+// Required for Recurring Donations.
+// Required for Recurring Donations.
+// Optional but highly recommended to add notes especially in the event of errors or updates to donations
+// Optional. Required if you want to catch and record payment gateway errors.
 
 
 /**
  * Class AcmeGatewayOnsiteClass
- * 
+ *
  */
 class AcmeGatewayOnsiteClass extends PaymentGateway
 {
