@@ -7,21 +7,9 @@ use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\PaymentComplete;
 use Give\Framework\PaymentGateways\Commands\SubscriptionComplete;
+use Give\Framework\PaymentGateways\Exceptions\PaymentGatewayException;
 use Give\Framework\PaymentGateways\PaymentGateway;
 use Give\Subscriptions\Models\Subscription;
-use Give\Subscriptions\ValueObjects\SubscriptionStatus;
-
-//Required. used to create the new class of the custom gateway
-// Required.
-// Required.
-// Required.
-// Required.
-// Required for Recurring Donations.
-// Required for Recurring Donations.
-// Required for Recurring Donations.
-// Optional but highly recommended to add notes especially in the event of errors or updates to donations
-// Optional. Required if you want to catch and record payment gateway errors.
-
 
 /**
  * Class AcmeGatewayOnsiteClass
@@ -82,39 +70,14 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
      * @inheritDoc
      */
     public function createPayment(Donation $donation, $gatewayData = null): GatewayCommand
-    {   
-        // some functions to process a payment (will vary based on the SDK of the gateway). 
-        
+    {
         try {
-            return new PaymentComplete("onsite-acme-gateway-transaction-id-$donation->id");
-        
-        } catch (Exception $e) {
-            $donation->status = DonationStatus::FAILED();
-            $errorMessage = $e->getMessage();
+            // Here is where you would add logic to process a payment (will vary based on the SDK of the gateway).
+            $paymentResponseExample = [
+                'transaction_id' => "onsite-acme-gateway-transaction-id-$donation->id"
+            ];
 
-            $donation->save();
-
-            DonationNote::create([
-                'donationId' => $donation->id,
-                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'acme-give'), $errorMessage)
-            ]);
-
-            throw new PaymentGatewayException($errorMessage);
-        }
-    }
-
-    public function createSubscription(
-        Donation $donation,
-        Subscription $subscription,
-        $gatewayData = null
-    ): GatewayCommand {
-
-        try {
-            return new SubscriptionComplete(
-                "os-acme-gateway-transaction-id-$donation->id",
-                "os-acme-gateway-subscription-id-$subscription->id"
-            );
-        
+            return new PaymentComplete($paymentResponseExample['transaction_id']);
         } catch (Exception $e) {
             $donation->status = DonationStatus::FAILED();
             $errorMessage = $e->getMessage();
@@ -131,38 +94,54 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
     }
 
     /**
-     * @since 2.20.0
+     * @inheritDoc
+     * @throws Exception
+     */
+    public function createSubscription(
+        Donation $donation,
+        Subscription $subscription,
+        $gatewayData
+    ): GatewayCommand {
+        try {
+            // this is where you would add logic to process a subscription (will vary based on the SDK of the gateway).
+            $processSubscriptionResponseExample = [
+                'transaction_id' => "os-acme-gateway-transaction-id-$donation->id",
+                'subscription_id' => "os-acme-gateway-subscription-id-$subscription->id"
+            ];
+
+            return new SubscriptionComplete(
+                $processSubscriptionResponseExample['transaction_id'],
+                $processSubscriptionResponseExample['subscription_id']
+            );
+        } catch (Exception $e) {
+            $donation->status = DonationStatus::FAILED();
+            $errorMessage = $e->getMessage();
+
+            $donation->save();
+
+            DonationNote::create([
+                'donationId' => $donation->id,
+                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'acme-give'), $errorMessage)
+            ]);
+
+            throw new PaymentGatewayException($errorMessage);
+        }
+    }
+
+    /**
      * @inerhitDoc
      * @throws Exception
      */
     public function refundDonation(Donation $donation)
     {
-        // some functions to process a refund (will vary based on the SDK of the gateway).
-        
-        $donation->status = DonationStatus::REFUNDED();
-        $donation->save();
+        // this is where you would add logic to process a refund (will vary based on the SDK of the gateway).
+        $processRefundResponseExample = [
+            'success' => true,
+        ];
 
-        
-    }
-
-    
-    /**
-     * @since 2.23.0
-     *
-     * @return void
-     */
-    private function updateSubscription(Subscription $subscription)
-    {
-        $subscription->status = SubscriptionStatus::ACTIVE();
-        $subscription->transactionId = "acme-test-gateway-transaction-id";
-        $subscription->save();
-    }
-
-    public function updateSubscriptionPaymentMethod(Subscription $subscription, $gatewayData=null)
-    {
-
-    }
-    public function updateSubscriptionAmount(Subscription $subscription, $newRenewalAmount )
-    {
+        if ($processRefundResponseExample['success'] === true) {
+            $donation->status = DonationStatus::REFUNDED();
+            $donation->save();
+        }
     }
 }
