@@ -62,22 +62,19 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
         // Markup added here
-        return "<div id='example-card-field'>A Field</div>
-                <div id='example-expiration-field'>B Field</div>";
+        return "<div><input type='text' name='example-gateway-id' placeholder='Example gateway field' /></div>";
     }
 
     /**
      * @inheritDoc
      */
-    public function createPayment(Donation $donation, $gatewayData = null): GatewayCommand
+    public function createPayment(Donation $donation, $gatewayData): GatewayCommand
     {
         try {
             // Here is where you would add logic to process a payment (will vary based on the SDK of the gateway).
-            $paymentResponseExample = [
-                'transaction_id' => "onsite-example-gateway-transaction-id-$donation->id"
-            ];
+            $response = $this->exampleRequest(['transaction_id' => $gatewayData['example_payment_id']]);
 
-            return new PaymentComplete($paymentResponseExample['transaction_id']);
+            return new PaymentComplete($response['transaction_id']);
         } catch (Exception $e) {
             $donation->status = DonationStatus::FAILED();
             $errorMessage = $e->getMessage();
@@ -104,14 +101,11 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     ): GatewayCommand {
         try {
             // this is where you would add logic to process a subscription (will vary based on the SDK of the gateway).
-            $processSubscriptionResponseExample = [
-                'transaction_id' => "os-example-gateway-transaction-id-$donation->id",
-                'subscription_id' => "os-example-gateway-subscription-id-$subscription->id"
-            ];
+            $response = $this->exampleRequest(['transaction_id' => $gatewayData['example_payment_id']]);
 
             return new SubscriptionComplete(
-                $processSubscriptionResponseExample['transaction_id'],
-                $processSubscriptionResponseExample['subscription_id']
+                $response['transaction_id'],
+                $response['subscription_id']
             );
         } catch (Exception $e) {
             $donation->status = DonationStatus::FAILED();
@@ -143,5 +137,18 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
             $donation->status = DonationStatus::REFUNDED();
             $donation->save();
         }
+    }
+
+
+    /**
+     * Example request to gateway
+     */
+    public function exampleRequest(array $data): array
+    {
+        return array_merge([
+            'success' => true,
+            'transaction_id' => '1234567890',
+            'subscription_id' => '0987654321',
+        ], $data);
     }
 }
