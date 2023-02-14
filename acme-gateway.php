@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: GiveWP Example Gateway
+ * Plugin Name: Give - Example Gateway
  * Description: Includes an on-site and off-site example gateway that showcases how to create GiveWP gateway add-ons.
  * Version: 0.1.0
  * Requires at least: 5.0
