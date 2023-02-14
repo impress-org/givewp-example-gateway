@@ -1,4 +1,4 @@
-=== Give - ACME Test Gateway ===
+=== Give - Example Test Gateway ===
 Contributors: givewp
 Tags: donations, donation, ecommerce, e-commerce, fundraising, fundraiser, gateway
 Requires at least: 5.0

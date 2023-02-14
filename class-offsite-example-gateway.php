@@ -15,10 +15,10 @@ use Give\Subscriptions\ValueObjects\SubscriptionStatus;
 
 
 /**
- * Class ACME-TestGatewayOffsite
+ * Class Example-TestGatewayOffsite
  *
  */
-class AcmeGatewayOffsiteClass extends PaymentGateway
+class ExampleGatewayOffsiteClass extends PaymentGateway
 {
     /**
      * @inheritDoc
@@ -33,7 +33,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      */
     public static function id(): string
     {
-        return 'acme-test-gateway-offsite';
+        return 'example-test-gateway-offsite';
     }
 
     /**
@@ -49,7 +49,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('Offsite ACME Test Gateway ', 'acme-give');
+        return __('Offsite Example Test Gateway ', 'example-give');
     }
 
     /**
@@ -57,7 +57,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('Offsite ACME Test Gateway', 'acme-give');
+        return __('Offsite Example Test Gateway', 'example-give');
     }
 
     /**
@@ -66,15 +66,15 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
         // For an offsite gateway, this is just help text that displays on the form. 
-        return "<div class='acme-offsite-help-text'>
-                    You will be taken away to ACME to complete the donation!
+        return "<div class='example-offsite-help-text'>
+                    You will be taken away to Example to complete the donation!
                 </div>";
     }
 
     /**
      * Get Sample Data to send to a gateway.
      */
-    public function getAcmeParameters(Donation $donation): array
+    public function getExampleParameters(Donation $donation): array
     {
         // this is just an example but,
         // you would need to get your own merchant ID and key from the gateway.
@@ -87,14 +87,14 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
             'merchant_id' => $secureMerchantId,
             'merchant_key' => $secureMerchantKey,
             'cancel_url' => give_get_failed_transaction_uri(),
-            'notify_url' => get_site_url() . '/?give-listener=ACME',
+            'notify_url' => get_site_url() . '/?give-listener=Example',
             'name_first' => $donation->firstName,
             'name_last' => $donation->lastName,
             'email_address' => $donation->email,
             'm_payment_id' => $donation->id,
             'amount' => $donation->amount->formatToDecimal(),
             'item_name' => $donation->formTitle,
-            'item_description' => sprintf(__('Donation via GiveWP, ID %s', 'acme-give'), $donation->id),
+            'item_description' => sprintf(__('Donation via GiveWP, ID %s', 'example-give'), $donation->id),
         ];
     }
 
@@ -103,7 +103,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      */
     public function createPayment(Donation $donation, $gatewayData)
     {
-        $baseParams = $this->getAcmeParameters($donation);
+        $baseParams = $this->getExampleParameters($donation);
         $returnUrl = [
             'return_url' => $this->generateSecureGatewayRouteUrl(
                 'securelyReturnFromOffsiteRedirectForDonation',
@@ -137,7 +137,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         ];
 
         $baseParams = array_merge(
-            $this->getAcmeParameters($donation),
+            $this->getExampleParameters($donation),
             $subscriptionParams
         );
 
@@ -173,12 +173,12 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         $donation = Donation::find($queryParams['givewp-donation-id']);
 
         $donation->status = DonationStatus::COMPLETE();
-        $donation->gatewayTransactionId = "acme-test-gateway-transaction-id";
+        $donation->gatewayTransactionId = "example-test-gateway-transaction-id";
         $donation->save();
 
         DonationNote::create([
             'donationId' => $donation->id,
-            'content' => 'Donation Completed from ACME-Test Gateway Offsite.'
+            'content' => 'Donation Completed from Example-Test Gateway Offsite.'
         ]);
 
         return new RedirectResponse(give_get_success_page_uri());
@@ -198,19 +198,19 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         $donation = Donation::find($queryParams['givewp-donation-id']);
 
         $donation->status = DonationStatus::COMPLETE();
-        $donation->gatewayTransactionId = "acme-test-gateway-transaction-id";
+        $donation->gatewayTransactionId = "example-test-gateway-transaction-id";
         $donation->save();
 
         DonationNote::create([
             'donationId' => $donation->id,
-            'content' => 'Donation Completed from ACME-Test Gateway Offsite.'
+            'content' => 'Donation Completed from Example-Test Gateway Offsite.'
         ]);
 
 
         /** @var Subscription $subscription */
         $subscription = Subscription::find($queryParams['givewp-subscription-id']);
         $subscription->status = SubscriptionStatus::ACTIVE();
-        $subscription->transactionId = "acme-test-gateway-transaction-id";
+        $subscription->transactionId = "example-test-gateway-transaction-id";
         $subscription->save();
 
 
@@ -244,7 +244,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
                 sprintf(
                     __(
                         'Failed to update amount for subscription %s.',
-                        'acme-give'
+                        'example-give'
                     ),
                     $subscription->id
                 ),
@@ -258,7 +258,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
             throw new PaymentGatewayException(
                 __(
                     'The amount was not updated.',
-                    'acme-give'
+                    'example-give'
                 )
             );
         }

@@ -12,10 +12,10 @@ use Give\Framework\PaymentGateways\PaymentGateway;
 use Give\Subscriptions\Models\Subscription;
 
 /**
- * Class AcmeGatewayOnsiteClass
+ * Class ExampleGatewayOnsiteClass
  *
  */
-class AcmeGatewayOnsiteClass extends PaymentGateway
+class ExampleGatewayOnsiteClass extends PaymentGateway
 {
     /**
      * @inheritDoc
@@ -29,7 +29,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
      */
     public static function id(): string
     {
-        return 'onsite-acme-test-gateway';
+        return 'onsite-example-test-gateway';
     }
 
     /**
@@ -45,7 +45,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('Onsite ACME Test Gateway', 'acme-give');
+        return __('Onsite Example Test Gateway', 'example-give');
     }
 
     /**
@@ -53,7 +53,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('Onsite ACME Test Gateway', 'acme-give');
+        return __('Onsite Example Test Gateway', 'example-give');
     }
 
     /**
@@ -62,8 +62,8 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
         // Markup added here
-        return "<div id='acme-card-field'>A Field</div>
-                <div id='acme-expiration-field'>B Field</div>";
+        return "<div id='example-card-field'>A Field</div>
+                <div id='example-expiration-field'>B Field</div>";
     }
 
     /**
@@ -74,7 +74,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
         try {
             // Here is where you would add logic to process a payment (will vary based on the SDK of the gateway).
             $paymentResponseExample = [
-                'transaction_id' => "onsite-acme-gateway-transaction-id-$donation->id"
+                'transaction_id' => "onsite-example-gateway-transaction-id-$donation->id"
             ];
 
             return new PaymentComplete($paymentResponseExample['transaction_id']);
@@ -86,7 +86,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
 
             DonationNote::create([
                 'donationId' => $donation->id,
-                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'acme-give'), $errorMessage)
+                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'example-give'), $errorMessage)
             ]);
 
             throw new PaymentGatewayException($errorMessage);
@@ -105,8 +105,8 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
         try {
             // this is where you would add logic to process a subscription (will vary based on the SDK of the gateway).
             $processSubscriptionResponseExample = [
-                'transaction_id' => "os-acme-gateway-transaction-id-$donation->id",
-                'subscription_id' => "os-acme-gateway-subscription-id-$subscription->id"
+                'transaction_id' => "os-example-gateway-transaction-id-$donation->id",
+                'subscription_id' => "os-example-gateway-subscription-id-$subscription->id"
             ];
 
             return new SubscriptionComplete(
@@ -121,7 +121,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
 
             DonationNote::create([
                 'donationId' => $donation->id,
-                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'acme-give'), $errorMessage)
+                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'example-give'), $errorMessage)
             ]);
 
             throw new PaymentGatewayException($errorMessage);
