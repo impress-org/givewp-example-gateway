@@ -7,6 +7,7 @@ use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\Http\Response\Types\RedirectResponse;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
+use Give\Framework\PaymentGateways\Exceptions\PaymentGatewayException;
 use Give\Framework\PaymentGateways\Log\PaymentGatewayLog;
 use Give\Framework\PaymentGateways\PaymentGateway;
 use Give\Subscriptions\Models\Subscription;
@@ -124,7 +125,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
     public function createSubscription(
         Donation $donation,
         Subscription $subscription,
-        $gatewayData
+        $gatewayData = null
     ): GatewayCommand {
         // Create a variable with an array of additional data needed to create the subscription.
         // Sample data is included here.
@@ -191,7 +192,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
      * @return RedirectResponse
      * @throws Exception
      */
-    protected function securelyReturnFromOffsiteRedirectAndUpdateSubscription(array $queryParams): RedirectResponse
+    protected function securelyReturnFromOffsiteRedirectForSubscription(array $queryParams): RedirectResponse
     {
         /** @var Donation $donation */
         $donation = Donation::find($queryParams['givewp-donation-id']);
@@ -227,12 +228,18 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
         $donation->save();
     }
 
+    /**
+     * @inerhitDoc
+     * @throws Exception
+     */
     public function updateSubscriptionAmount(Subscription $subscription, $newRenewalAmount)
     {
         // some functions to send the call to the gateway to update the amount. $newRenewalAmount is the updated amount of the subscriptions.
-        $apiResponse = true;
+        $apiResponse = [
+            'success' => true
+        ];
 
-        if ($apiResponse == false) {
+        if (!$apiResponse['success']) {
             PaymentGatewayLog::error(
                 sprintf(
                     __(
@@ -243,7 +250,7 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
                 ),
                 [
                     'Payment Gateway' => $this->getName(),
-                    'Subscription' => $subscription->$id,
+                    'Subscription' => $subscription->id,
                     'Error Code' => "999",
                     'Error Message' => "something actionable from the gateway!",
                 ]
@@ -260,9 +267,5 @@ class AcmeGatewayOffsiteClass extends PaymentGateway
             'Payment Gateway' => "noodles",
             'Subscription' => "mo problems",
         ]);
-    }
-
-    public function updateSubscriptionPaymentMethod(Subscription $subscription, $gatewayData = null)
-    {
     }
 }

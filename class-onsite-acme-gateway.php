@@ -100,7 +100,7 @@ class AcmeGatewayOnsiteClass extends PaymentGateway
     public function createSubscription(
         Donation $donation,
         Subscription $subscription,
-        $gatewayData
+        $gatewayData = null
     ): GatewayCommand {
         try {
             // this is where you would add logic to process a subscription (will vary based on the SDK of the gateway).
