@@ -45,7 +45,7 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('Onsite Example Test Gateway', 'example-give');
+        return __('Example Gateway - Onsite', 'example-give');
     }
 
     /**
@@ -53,7 +53,7 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('Onsite Example Test Gateway', 'example-give');
+        return __('Example Gateway - Onsite', 'example-give');
     }
 
     /**

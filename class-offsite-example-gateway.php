@@ -49,7 +49,7 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
      */
     public function getName(): string
     {
-        return __('Offsite Example Test Gateway ', 'example-give');
+        return __('Example Gateway - Offsite', 'example-give');
     }
 
     /**
@@ -57,7 +57,7 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
      */
     public function getPaymentMethodLabel(): string
     {
-        return __('Offsite Example Test Gateway', 'example-give');
+        return __('Example Gateway - Offsite', 'example-give');
     }
 
     /**
