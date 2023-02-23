@@ -5,18 +5,12 @@ use Give\Donations\Models\DonationNote;
 use Give\Donations\ValueObjects\DonationStatus;
 use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\Http\Response\Types\RedirectResponse;
-use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
-use Give\Framework\PaymentGateways\Exceptions\PaymentGatewayException;
-use Give\Framework\PaymentGateways\Log\PaymentGatewayLog;
 use Give\Framework\PaymentGateways\PaymentGateway;
-use Give\Subscriptions\Models\Subscription;
-use Give\Subscriptions\ValueObjects\SubscriptionStatus;
 
 
 /**
- * Class Example-TestGatewayOffsite
- *
+ * @inheritDoc
  */
 class ExampleGatewayOffsiteClass extends PaymentGateway
 {
@@ -24,8 +18,7 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
      * @inheritDoc
      */
     public $secureRouteMethods = [
-        'securelyReturnFromOffsiteRedirectForDonation',
-        'securelyReturnFromOffsiteRedirectForSubscription',
+        'handleCreatePaymentRedirect',
     ];
 
     /**
@@ -67,7 +60,7 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
     {
         // For an offsite gateway, this is just help text that displays on the form. 
         return "<div class='example-offsite-help-text'>
-                    You will be taken away to Example to complete the donation!
+                    <p>You will be taken away to Example to complete the donation!</p>
                 </div>";
     }
 
@@ -103,77 +96,54 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
      */
     public function createPayment(Donation $donation, $gatewayData)
     {
-        $baseParams = $this->getExampleParameters($donation);
-        $returnUrl = [
-            'return_url' => $this->generateSecureGatewayRouteUrl(
-                'securelyReturnFromOffsiteRedirectForDonation',
-                $donation->id,
-                ['givewp-donation-id' => $donation->id]
-            )
-        ];
-        $params = array_merge($baseParams, $returnUrl);
+        // Step 1: generate a secure gateway route URL that will be used to redirect the donor to the gateway.
+        // The args you pass it will be available in the $queryParams parameter in the secureRouteMethod that you defined below.
+        $returnUrl = $this->generateSecureGatewayRouteUrl(
+            'handleCreatePaymentRedirect',
+            $donation->id,
+            [
+                'givewp-donation-id' => $donation->id,
+                'givewp-success-url' => urlencode(give_get_success_page_uri()),
+                // this would likely be a transaction ID from the gateway upon return.
+                'givewp-gateway-transaction-id' => '123456789',
+            ]
 
-        // This will redirect to example.com and one of the query strings will be the URL that you can visit to simulate a successful donation.
-        $url = add_query_arg($params, "https://example.com");
-
-        return new RedirectOffsite($url);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function createSubscription(
-        Donation $donation,
-        Subscription $subscription,
-        $gatewayData = null
-    ): GatewayCommand {
-        // Create a variable with an array of additional data needed to create the subscription.
-        // Sample data is included here.
-        $subscriptionParams = [
-            'subscription_type' => '1',
-            'frequency' => $subscription->frequency,
-            'cycles' => $subscription->installments,
-            'recurring_amount' => $donation->amount->formatToDecimal(),
-        ];
-
-        $baseParams = array_merge(
-            $this->getExampleParameters($donation),
-            $subscriptionParams
         );
 
-        $returnUrl = [
-            'return_url' => $this->generateSecureGatewayRouteUrl(
-                'securelyReturnFromOffsiteRedirectForSubscription',
-                $donation->id,
-                [
-                    'givewp-donation-id' => $donation->id,
-                    'givewp-subscription-id' => $subscription->id
-                ]
-            )
-        ];
+        // Step 2: Get the parameters you need to send to the gateway.
+        $queryParams = array_merge(
+            $this->getExampleParameters($donation),
+            // this just an example of a return url parameter, this will be specific to your gateway.
+            ['return_url' => $returnUrl]
+        );
 
-        $params = array_merge($baseParams, $returnUrl);
+        // Step 3: Generate the URL to redirect the donor to, using the queryParams you created that contains the secure gateway route URL..
+        $url = add_query_arg($queryParams, "https://example.com");
 
-        $url = add_query_arg($params, "https://example.com");
-
+        // Step 4: Return a RedirectOffsite command with the generated URL to redirect the donor to the gateway.
         return new RedirectOffsite($url);
     }
 
+
     /**
      * An example of using a secureRouteMethod for extending the Gateway API to handle a redirect.
      *
-     * @param  array  $queryParams
-     *
-     * @return RedirectResponse
      * @throws Exception
      */
-    protected function securelyReturnFromOffsiteRedirectForDonation(array $queryParams): RedirectResponse
+    protected function handleCreatePaymentRedirect(array $queryParams): RedirectResponse
     {
-        /** @var Donation $donation */
-        $donation = Donation::find($queryParams['givewp-donation-id']);
+        // Step 1: Use the $queryParams to get the data you need to complete the donation.
+        $donationId = $queryParams['givewp-donation-id'];
+        $gatewayTransactionId = $queryParams['givewp-gateway-transaction-id'];
+        $successUrl = $queryParams['givewp-success-url'];
 
+        // Step 2: Typically you will find the donation from the donation ID.
+        /** @var Donation $donation */
+        $donation = Donation::find($donationId);
+
+        // Step 3: Use the Donation model to update the donation based on the transaction and response from the gateway.
         $donation->status = DonationStatus::COMPLETE();
-        $donation->gatewayTransactionId = "example-test-gateway-transaction-id";
+        $donation->gatewayTransactionId = $gatewayTransactionId;
         $donation->save();
 
         DonationNote::create([
@@ -181,91 +151,20 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
             'content' => 'Donation Completed from Example-Test Gateway Offsite.'
         ]);
 
-        return new RedirectResponse(give_get_success_page_uri());
+        // Step 4: Return a RedirectResponse to the GiveWP success page.
+        return new RedirectResponse($successUrl);
     }
 
     /**
-     * An example of using a secureRouteMethod for extending the Gateway API to handle a redirect.
-     *
-     * @param  array  $queryParams
-     *
-     * @return RedirectResponse
-     * @throws Exception
-     */
-    protected function securelyReturnFromOffsiteRedirectForSubscription(array $queryParams): RedirectResponse
-    {
-        /** @var Donation $donation */
-        $donation = Donation::find($queryParams['givewp-donation-id']);
-
-        $donation->status = DonationStatus::COMPLETE();
-        $donation->gatewayTransactionId = "example-test-gateway-transaction-id";
-        $donation->save();
-
-        DonationNote::create([
-            'donationId' => $donation->id,
-            'content' => 'Donation Completed from Example-Test Gateway Offsite.'
-        ]);
-
-
-        /** @var Subscription $subscription */
-        $subscription = Subscription::find($queryParams['givewp-subscription-id']);
-        $subscription->status = SubscriptionStatus::ACTIVE();
-        $subscription->transactionId = "example-test-gateway-transaction-id";
-        $subscription->save();
-
-
-        return new RedirectResponse(give_get_success_page_uri());
-    }
-
-    /**
+     * TODO: return command
      *
      * @inerhitDoc
+     *
      * @throws Exception
      */
     public function refundDonation(Donation $donation)
     {
         $donation->status = DonationStatus::REFUNDED();
         $donation->save();
-    }
-
-    /**
-     * @inerhitDoc
-     * @throws Exception
-     */
-    public function updateSubscriptionAmount(Subscription $subscription, $newRenewalAmount)
-    {
-        // some functions to send the call to the gateway to update the amount. $newRenewalAmount is the updated amount of the subscriptions.
-        $apiResponse = [
-            'success' => true
-        ];
-
-        if (!$apiResponse['success']) {
-            PaymentGatewayLog::error(
-                sprintf(
-                    __(
-                        'Failed to update amount for subscription %s.',
-                        'example-give'
-                    ),
-                    $subscription->id
-                ),
-                [
-                    'Payment Gateway' => $this->getName(),
-                    'Subscription' => $subscription->id,
-                    'Error Code' => "999",
-                    'Error Message' => "something actionable from the gateway!",
-                ]
-            );
-            throw new PaymentGatewayException(
-                __(
-                    'The amount was not updated.',
-                    'example-give'
-                )
-            );
-        }
-
-        PaymentGatewayLog::info('Amount updated ', [
-            'Payment Gateway' => "noodles",
-            'Subscription' => "mo problems",
-        ]);
     }
 }

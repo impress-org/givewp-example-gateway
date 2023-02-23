@@ -30,15 +30,3 @@ add_filter(
         return $gatewayData;
     }
 );
-
-// Filter through the gateway data to add your own data to the $gatewayData param
-add_filter(
-    sprintf("givewp_create_subscription_gateway_data_%s", 'onsite-example-test-gateway'),
-    static function ($gatewayData) {
-        if (isset($_POST['example-gateway-id'])) {
-            $gatewayData['example_payment_id'] = sanitize_text_field($_POST['example-gateway-id']);
-        }
-
-        return $gatewayData;
-    }
-);

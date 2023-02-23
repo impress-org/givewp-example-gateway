@@ -6,24 +6,14 @@ use Give\Donations\ValueObjects\DonationStatus;
 use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\PaymentComplete;
-use Give\Framework\PaymentGateways\Commands\SubscriptionComplete;
 use Give\Framework\PaymentGateways\Exceptions\PaymentGatewayException;
 use Give\Framework\PaymentGateways\PaymentGateway;
-use Give\Subscriptions\Models\Subscription;
 
 /**
- * Class ExampleGatewayOnsiteClass
- *
+ * @inheritDoc
  */
 class ExampleGatewayOnsiteClass extends PaymentGateway
 {
-    /**
-     * @inheritDoc
-     */
-    public $secureRouteMethods = [
-        'securelyReturnFromOffsiteRedirect'
-    ];
-
     /**
      * @inheritDoc
      */
@@ -61,7 +51,8 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
-        // Markup added here
+        // Step 1: add any gateway fields to the form using html.
+        // Step 2: you can send this data to the $gatewayData param using the filter `givewp_create_payment_gateway_data_{gatewayId}`.
         return "<div><input type='text' name='example-gateway-id' placeholder='Example gateway field' /></div>";
     }
 
@@ -71,14 +62,21 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     public function createPayment(Donation $donation, $gatewayData): GatewayCommand
     {
         try {
-            // Here is where you would add logic to process a payment (will vary based on the SDK of the gateway).
+            // Step 1: Validate any data passed from the gateway fields in $gatewayData.  Throw the PaymentGatewayException if the data is invalid.
+            if (empty($gatewayData['example_payment_id'])) {
+                throw new PaymentGatewayException('Example payment ID is required.');
+            }
+
+            // Step 2: Create a payment with your gateway.
             $response = $this->exampleRequest(['transaction_id' => $gatewayData['example_payment_id']]);
 
+            // Step 3: Return a command to complete the donation.
             return new PaymentComplete($response['transaction_id']);
         } catch (Exception $e) {
-            $donation->status = DonationStatus::FAILED();
+            // Step 4: If an error occurs, you can update the donation status to something appropriate like failed, and finally throw the PaymentGatewayException for the framework to catch the message.
             $errorMessage = $e->getMessage();
 
+            $donation->status = DonationStatus::FAILED();
             $donation->save();
 
             DonationNote::create([
@@ -91,52 +89,16 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     }
 
     /**
-     * @inheritDoc
-     * @throws Exception
-     */
-    public function createSubscription(
-        Donation $donation,
-        Subscription $subscription,
-        $gatewayData = null
-    ): GatewayCommand {
-        try {
-            // this is where you would add logic to process a subscription (will vary based on the SDK of the gateway).
-            $response = $this->exampleRequest(['transaction_id' => $gatewayData['example_payment_id']]);
-
-            return new SubscriptionComplete(
-                $response['transaction_id'],
-                $response['subscription_id']
-            );
-        } catch (Exception $e) {
-            $donation->status = DonationStatus::FAILED();
-            $errorMessage = $e->getMessage();
-
-            $donation->save();
-
-            DonationNote::create([
-                'donationId' => $donation->id,
-                'content' => sprintf(esc_html__('Donation failed. Reason: %s', 'example-give'), $errorMessage)
-            ]);
-
-            throw new PaymentGatewayException($errorMessage);
-        }
-    }
-
-    /**
+     * TODO: return command
+     *
      * @inerhitDoc
      * @throws Exception
      */
     public function refundDonation(Donation $donation)
     {
         // this is where you would add logic to process a refund (will vary based on the SDK of the gateway).
-        $processRefundResponseExample = [
-            'success' => true,
-        ];
-
-        if ($processRefundResponseExample['success'] === true) {
-            $donation->status = DonationStatus::REFUNDED();
-            $donation->save();
-        }
+        $donation->status = DonationStatus::REFUNDED();
+        $donation->save();
     }
 
 
