@@ -6,6 +6,7 @@ use Give\Donations\ValueObjects\DonationStatus;
 use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\PaymentGateways\Commands\GatewayCommand;
 use Give\Framework\PaymentGateways\Commands\PaymentComplete;
+use Give\Framework\PaymentGateways\Commands\PaymentRefunded;
 use Give\Framework\PaymentGateways\Exceptions\PaymentGatewayException;
 use Give\Framework\PaymentGateways\PaymentGateway;
 
@@ -89,23 +90,20 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     }
 
     /**
-     * TODO: return command
-     *
      * @inerhitDoc
-     * @throws Exception
      */
-    public function refundDonation(Donation $donation)
+    public function refundDonation(Donation $donation): PaymentRefunded
     {
-        // this is where you would add logic to process a refund (will vary based on the SDK of the gateway).
-        $donation->status = DonationStatus::REFUNDED();
-        $donation->save();
+        // Step 1: refund the donation with your gateway.
+        // Step 2: return a command to complete the refund.
+        return new PaymentRefunded();
     }
 
 
     /**
      * Example request to gateway
      */
-    public function exampleRequest(array $data): array
+    private function exampleRequest(array $data): array
     {
         return array_merge([
             'success' => true,

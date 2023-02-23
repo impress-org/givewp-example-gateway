@@ -5,6 +5,7 @@ use Give\Donations\Models\DonationNote;
 use Give\Donations\ValueObjects\DonationStatus;
 use Give\Framework\Exceptions\Primitives\Exception;
 use Give\Framework\Http\Response\Types\RedirectResponse;
+use Give\Framework\PaymentGateways\Commands\PaymentRefunded;
 use Give\Framework\PaymentGateways\Commands\RedirectOffsite;
 use Give\Framework\PaymentGateways\PaymentGateway;
 
@@ -155,15 +156,12 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
     }
 
     /**
-     * TODO: return command
-     *
      * @inerhitDoc
-     *
-     * @throws Exception
      */
-    public function refundDonation(Donation $donation)
+    public function refundDonation(Donation $donation): PaymentRefunded
     {
-        $donation->status = DonationStatus::REFUNDED();
-        $donation->save();
+        // Step 1: refund the donation with your gateway.
+        // Step 2: return a command to complete the refund.
+        return new PaymentRefunded();
     }
 }
