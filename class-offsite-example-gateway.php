@@ -107,7 +107,6 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
                 // this would likely be a transaction ID from the gateway upon return.
                 'givewp-gateway-transaction-id' => '123456789',
             ]
-
         );
 
         // Step 2: Get the parameters you need to send to the gateway.
@@ -117,11 +116,11 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
             ['return_url' => $returnUrl]
         );
 
-        // Step 3: Generate the URL to redirect the donor to, using the queryParams you created that contains the secure gateway route URL..
-        $url = add_query_arg($queryParams, "https://example.com");
+        // Step 3: Generate the URL to redirect the donor to, using the queryParams you created that contains the secure gateway route URL.
+        $gatewayUrl = add_query_arg($queryParams, "https://example.com");
 
         // Step 4: Return a RedirectOffsite command with the generated URL to redirect the donor to the gateway.
-        return new RedirectOffsite($url);
+        return new RedirectOffsite($gatewayUrl);
     }
 
 
