@@ -23,10 +23,13 @@ add_action('givewp_register_payment_gateway', static function ($paymentGatewayRe
 add_filter(
     sprintf("givewp_create_payment_gateway_data_%s", 'onsite-example-test-gateway'),
     static function ($gatewayData) {
+        // Step 1: Validate the data you need to add to the gatewayData (This comes from your gateway fields).
         if (isset($_POST['example-gateway-id'])) {
+            // Step 2: Assign the sanitized data to the gatewayData as an array item.
             $gatewayData['example_payment_id'] = sanitize_text_field($_POST['example-gateway-id']);
         }
 
+        // Step 3: Return the gatewayData array.
         return $gatewayData;
     }
 );
