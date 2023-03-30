@@ -52,9 +52,9 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
-        // Step 1: add any gateway fields to the form using html.
-        // Step 2: you can send this data to the $gatewayData param using the filter `givewp_create_payment_gateway_data_{gatewayId}`.
-        return "<div><input type='text' name='example-gateway-id' placeholder='Example gateway field' /></div>";
+        // Step 1: add any gateway fields to the form using html.  In order to retrieve this data later the name of the input must be inside the key gatewayData (name='gatewayData[input_name]').
+        // Step 2: you can alternatively send this data to the $gatewayData param using the filter `givewp_create_payment_gateway_data_{gatewayId}`.
+        return "<div><input type='text' name='gatewayData[example-gateway-id]' placeholder='Example gateway field' /></div>";
     }
 
     /**
@@ -64,12 +64,12 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     {
         try {
             // Step 1: Validate any data passed from the gateway fields in $gatewayData.  Throw the PaymentGatewayException if the data is invalid.
-            if (empty($gatewayData['example_payment_id'])) {
+            if (empty($gatewayData['example-gateway-id'])) {
                 throw new PaymentGatewayException('Example payment ID is required.');
             }
 
             // Step 2: Create a payment with your gateway.
-            $response = $this->exampleRequest(['transaction_id' => $gatewayData['example_payment_id']]);
+            $response = $this->exampleRequest(['transaction_id' => $gatewayData['example-gateway-id']]);
 
             // Step 3: Return a command to complete the donation.
             return new PaymentComplete($response['transaction_id']);
