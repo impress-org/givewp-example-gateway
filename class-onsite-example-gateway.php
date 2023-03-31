@@ -71,7 +71,8 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
             // Step 2: Create a payment with your gateway.
             $response = $this->exampleRequest(['transaction_id' => $gatewayData['example-gateway-id']]);
 
-            // Step 3: Return a command to complete the donation.
+            // Step 3: Return a command to complete the donation. You can alternatively return PaymentProcessing for gateways that require a webhook or similar to confirm that the payment is complete. PaymentProcessing will trigger a Payment Processing email notification, configurable in the settings.
+            
             return new PaymentComplete($response['transaction_id']);
         } catch (Exception $e) {
             // Step 4: If an error occurs, you can update the donation status to something appropriate like failed, and finally throw the PaymentGatewayException for the framework to catch the message.
