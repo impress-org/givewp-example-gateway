@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Give - Example Gateway
+ * Plugin Name: Example Gateway for GiveWP
  * Description: Create your own GiveWP payment gateway using this plugin as a guide.
  * Version: 0.1.0
  * Requires at least: 5.0
