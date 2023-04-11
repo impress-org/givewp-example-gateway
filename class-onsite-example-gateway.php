@@ -65,7 +65,7 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
         try {
             // Step 1: Validate any data passed from the gateway fields in $gatewayData.  Throw the PaymentGatewayException if the data is invalid.
             if (empty($gatewayData['example-gateway-id'])) {
-                throw new PaymentGatewayException('Example payment ID is required.');
+                throw new PaymentGatewayException(__('Example payment ID is required.', 'example-give' ) );
             }
 
             // Step 2: Create a payment with your gateway.
