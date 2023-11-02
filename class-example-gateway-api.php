@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Example gateway api
+ * This is a fake gateway api, used simply as an example throughout our example gateways.
  */
 class ExampleGatewayApi
 {
@@ -13,7 +13,7 @@ class ExampleGatewayApi
         ], $data);
     }
 
-    public static function refundPayment(): bool
+    public static function refundPayment(string $paymentId): bool
     {
         return true;
     }
