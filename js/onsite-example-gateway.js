@@ -1,5 +1,6 @@
 /**
  * Start with a Self-Executing Anonymous Function (IIFE) to avoid polluting and conflicting with the global namespace (encapsulation).
+ * @see https://developer.mozilla.org/en-US/docs/Glossary/IIFE
  *
  * This won't be necessary if you're using a build system like webpack.
  */
