@@ -66,6 +66,16 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     }
 
     /**
+     * Send form settings to the js gateway counterpart
+     */
+    public function formSettings(int $formId): array
+    {
+        return [
+            'clientKey' => '1234567890'
+        ];
+    }
+
+    /**
      * @inheritDoc
      */
     public function createPayment(Donation $donation, $gatewayData): GatewayCommand
