@@ -62,7 +62,7 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
      */
     public function enqueueScript(int $formId)
     {
-        wp_enqueue_script('example-gateway-js', plugin_dir_url(__FILE__) . 'js/onsite-example-gateway.js', ['react', 'wp-element'], '1.0.0', true);
+        wp_enqueue_script('onsite-example-gateway', plugin_dir_url(__FILE__) . 'js/onsite-example-gateway.js', ['react', 'wp-element'], '1.0.0', true);
     }
 
     /**
@@ -90,7 +90,6 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
             $response = $this->exampleRequest(['transaction_id' => $gatewayData['example-gateway-id']]);
 
             // Step 3: Return a command to complete the donation. You can alternatively return PaymentProcessing for gateways that require a webhook or similar to confirm that the payment is complete. PaymentProcessing will trigger a Payment Processing email notification, configurable in the settings.
-            
             return new PaymentComplete($response['transaction_id']);
         } catch (Exception $e) {
             // Step 4: If an error occurs, you can update the donation status to something appropriate like failed, and finally throw the PaymentGatewayException for the framework to catch the message.
