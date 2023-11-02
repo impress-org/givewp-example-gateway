@@ -16,6 +16,8 @@ use Give\Subscriptions\ValueObjects\SubscriptionStatus;
 class ExampleGatewayOnsiteSubscriptionModuleClass extends SubscriptionModule
 {
     /**
+     * @inerhitDoc
+     *
      * @throws Exception|PaymentGatewayException
      */
     public function createSubscription(
@@ -51,13 +53,17 @@ class ExampleGatewayOnsiteSubscriptionModuleClass extends SubscriptionModule
     }
 
     /**
+     * @inerhitDoc
+     *
      * @throws PaymentGatewayException
      */
     public function cancelSubscription(Subscription $subscription)
     {
         try {
+            // Step 1: cancel the subscription with your gateway.
             ExampleGatewayApi::cancelSubscription($subscription->gatewaySubscriptionId);
 
+            // Step 2: update the subscription status to cancelled.
             $subscription->status = SubscriptionStatus::CANCELLED();
             $subscription->save();
         } catch (\Exception $exception) {
