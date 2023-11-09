@@ -48,13 +48,31 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
     }
 
     /**
-     * @inheritDoc
+     * Display gateway fields for v2 donation forms
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
     {
         // Step 1: add any gateway fields to the form using html.  In order to retrieve this data later the name of the input must be inside the key gatewayData (name='gatewayData[input_name]').
         // Step 2: you can alternatively send this data to the $gatewayData param using the filter `givewp_create_payment_gateway_data_{gatewayId}`.
         return "<div><input type='text' name='gatewayData[example-gateway-id]' placeholder='Example gateway field' /></div>";
+    }
+
+    /**
+     * Register a js file to display gateway fields for v3 donation forms
+     */
+    public function enqueueScript(int $formId)
+    {
+        wp_enqueue_script('onsite-example-gateway', plugin_dir_url(__FILE__) . 'js/onsite-example-gateway.js', ['react', 'wp-element'], '1.0.0', true);
+    }
+
+    /**
+     * Send form settings to the js gateway counterpart
+     */
+    public function formSettings(int $formId): array
+    {
+        return [
+            'clientKey' => '1234567890'
+        ];
     }
 
     /**
@@ -72,7 +90,6 @@ class ExampleGatewayOnsiteClass extends PaymentGateway
             $response = $this->exampleRequest(['transaction_id' => $gatewayData['example-gateway-id']]);
 
             // Step 3: Return a command to complete the donation. You can alternatively return PaymentProcessing for gateways that require a webhook or similar to confirm that the payment is complete. PaymentProcessing will trigger a Payment Processing email notification, configurable in the settings.
-            
             return new PaymentComplete($response['transaction_id']);
         } catch (Exception $e) {
             // Step 4: If an error occurs, you can update the donation status to something appropriate like failed, and finally throw the PaymentGatewayException for the framework to catch the message.
