@@ -55,6 +55,24 @@ class ExampleGatewayOffsiteClass extends PaymentGateway
     }
 
     /**
+     * Register a js file to display gateway fields for v3 donation forms
+     */
+    public function enqueueScript(int $formId)
+    {
+        wp_enqueue_script('offsite-example-gateway', plugin_dir_url(__FILE__) . 'js/offsite-example-gateway.js', ['react', 'wp-element'], '1.0.0', true);
+    }
+
+    /**
+     * Send form settings to the js gateway counterpart
+     */
+    public function formSettings(int $formId): array
+    {
+        return [
+            'message' => __('You will be taken away to Example to complete the donation!', 'example-give'),
+        ];
+    }
+
+    /**
      * @inheritDoc
      */
     public function getLegacyFormFieldMarkup(int $formId, array $args): string
